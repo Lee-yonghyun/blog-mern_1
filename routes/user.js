@@ -3,6 +3,7 @@ const router = express.Router()
 const userModel = require('../models/user')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+const gravatar = require('gravatar')
 
 
 
@@ -23,6 +24,12 @@ router.post('/registor',(req,res) => {
 
             else{
 
+                const avatar = gravatar.url(email, {
+                    s: "200", //크기
+                    r: "pg", //형식
+                    d: "mm" //단위
+                })
+
                 bcrypt.hash (password, 10, (err, hash) => {
 
                     if(err) {
@@ -35,7 +42,8 @@ router.post('/registor',(req,res) => {
                         const newUser = new userModel({
                             name,
                             email,
-                            password:hash
+                            password:hash,
+                            avatar:avatar
                         })
 
                         newUser
@@ -43,7 +51,17 @@ router.post('/registor',(req,res) => {
                             .then(user => {
                                 res.json({
                                     message:'saved data',
-                                    userInfo:user
+                                    userInfo:{
+                                        id:user._id,
+                                        name:user.name,
+                                        email:user.email,
+                                        password:user.password,
+                                        avatar:user.avatar,
+                                        date:{
+                                            createDate:user.createdAt,
+                                            updateData:user.updatedAt
+                                        }
+                                    }
                                 })
                             })
                             .catch(err=>{
