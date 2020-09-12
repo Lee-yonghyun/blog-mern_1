@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const userModel = require('../models/user')
 const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
 
 
 
@@ -72,14 +73,45 @@ router.post('/login',(req, res) => {
         .findOne({email})
         .then(user => {
 
+            if(!user) {
+                return res.json({
+                    message:'your eamil wrong'
+                })
+            }
+
+            else{
+                //user가 등록되어 있다면?
+                bcrypt.compare(password, user.password, (err,result) => {
+
+                    if(err || result === false){
+                        return res.json({
+                            success:result,
+                            message:'password incorrect'
+                        })
+                    }
+
+                    else{
+
+                        const token = jwt.sign(
+                            {email:user.email, userId:user._id},
+                            "key",
+                            {expiresIn: "1d"}
+                        )
+
+                        res.json({
+                            success:result,
+                            token:token
+                        })
+                    }
+                })
+            }
         })
 
-        .catch(errr => {
+        .catch(err => {
             res.json({
                 message:err.message
             })
         })
-
 })
 
 
