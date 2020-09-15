@@ -10,66 +10,50 @@ const gravatar = require('gravatar')
 //@ 회원가입
 router.post('/registor',(req,res) => {
 
-    const {name, email, password} = req.body
+    const {name, email, password} = req.body;
 
     userModel
         .findOne({email})
         .then(user => {
-
             if (user) {
                 return res.json({
                     message:'email already existed'
-                })
+                });
             }
 
             else{
 
-                const avatar = gravatar.url(email, {
-                    s: "200", //크기
-                    r: "pg", //형식
-                    d: "mm" //단위
+                const newUser = new userModel({
+                    name,
+                    email,
+                    password
                 })
 
-                bcrypt.hash (password, 10, (err, hash) => {
+                newUser
+                .save()
+                .then(user => {
 
-                    if(err) {
-                        return res.json({
-                            message:err.message
-                        })
-                    }
+                    console.log(user);
 
-                    else {
-                        const newUser = new userModel({
-                            name,
-                            email,
-                            password:hash,
-                            avatar:avatar
-                        })
-
-                        newUser
-                            .save()
-                            .then(user => {
-                                res.json({
-                                    message:'saved data',
-                                    userInfo:{
-                                        id:user._id,
-                                        name:user.name,
-                                        email:user.email,
-                                        password:user.password,
-                                        avatar:user.avatar,
-                                        date:{
-                                            createDate:user.createdAt,
-                                            updateData:user.updatedAt
-                                        }
-                                    }
-                                })
-                            })
-                            .catch(err=>{
-                                res.json({
-                                    message:err.message
-                                })
-                            })
-                    }
+                    res.json({
+                        message:'saved data',
+                        userInfo:{
+                            id:user._id,
+                            name:user.name,
+                            email:user.email,
+                            password:user.password,
+                            avatar:user.avatar,
+                            date:{
+                                createDate:user.createdAt,
+                                updateData:user.updatedAt
+                            }
+                        }
+                    })
+                })
+                .catch(err => {
+                    res.json({
+                        message:err.message
+                    })
                 })
             }
         })
