@@ -33,14 +33,43 @@ router.get('/current' , checkAuth, (req,res) => {
         email:req.user.email,
         name:req.user.name,
         avatar:req.user.avatar,
-        password:req.user.password
+        // password:req.user.password
     })
 })
- //payload에 담기지 않은 정보는 가져올 수 없다.
+ //payload에 담기지 않은 정보는 가져올 수 없다. x -> 가져올수 있다. usermodel에서 가져오기 때문에 가져올 수 있다.
+
 
 
 //@전체 유저 정보 가져오기
+router.get('/all',checkAuth,(req,res) => {
 
+    userModel
+        .findById(req.user.id) //passport의 return된 user값
+        .then(user => {
+
+            if(user.role !== "admin") {
+                return res.json({
+                    message:"you are not admin"
+                })
+            }
+
+            else{
+                userModel
+                    .find()
+                    .then(users => res.json(users))
+                    .catch(err => {
+                        res.json({
+                            message:err.message
+                        })
+                    })
+            }
+        })
+        .catch(err => {
+            res.json({
+                message:err.message
+            })
+        })
+})
 
 
 
