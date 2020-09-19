@@ -27,9 +27,20 @@ router.post('/registor',checkAuth,(req,res) => {
     profileModel
         .findOne({user:req.user.id})
         .then(profile => {
-            //profile이 있다면? --> 수정
-            if(profile){
 
+            if (!profile) {
+                new profileModel(profileFields)
+                    .save()
+                    .then(profile => {
+                        res.status(200).json(profile)
+                    })
+                    .catch(err => {
+                        res.status(500).json({
+                            message:err.message
+                        })
+                    })
+            }
+            else {
                 profileModel
                     .findOneAndUpdate(
                         {user: req.user.id},
@@ -45,7 +56,6 @@ router.post('/registor',checkAuth,(req,res) => {
                         })
                     })
             }
-
         })
         .catch(err => {
             res.json({
@@ -78,6 +88,7 @@ router.get('/',checkAuth,(req,res) => {
         })
 })
 
+
 // 프로필 모두 가져오기 (모든 사용자가  사용하는 기능)
 router.get('/total', (req,res) => {
 
@@ -107,5 +118,23 @@ router.get('/total', (req,res) => {
 
 })
 
+
+//프로필 삭제 (개인)
+router.delete('/',checkAuth ,(req,res) => {
+
+    profileModel
+        .findOneAndDelete({user:req.user.id})
+        .then(() => {
+            res.status(200).json({
+                message:"delete profile"
+            })
+        })
+        .catch(err => {
+            res.status(500).json({
+                message:err.message
+            })
+        })
+
+})
 
 module.exports = router
