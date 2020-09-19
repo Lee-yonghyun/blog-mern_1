@@ -5,8 +5,7 @@ const passport = require('passport')
 const checkAuth = passport.authenticate("jwt",{session: false})
 
 
-//프로필 등록
-
+//프로필 등록 및 업데이트 (put없이 !)
 router.post('/registor',checkAuth,(req,res) => {
 
     const profileFields ={};
@@ -28,19 +27,20 @@ router.post('/registor',checkAuth,(req,res) => {
     profileModel
         .findOne({user:req.user.id})
         .then(profile => {
-            //profile이 있다면?
+            //profile이 있다면? --> 수정
             if(profile){
-                return res.status(200).json({
-                    message: "profile already exists, please update profile"
-                })
-            }
-            //profile이 x
-            else {
-                new profileModel(profileFields)
-                    .save()
-                    .then(profile => res.status(200).json(profile))
+
+                profileModel
+                    .findOneAndUpdate(
+                        {user: req.user.id},
+                        {$set: profileFields},
+                        {new: true}
+                    )
+                    .then(profile => {
+                        res.status(200).json(profile)
+                    })
                     .catch(err => {
-                        res.status(400).json({
+                        res.status(404).json({
                             message:err.message
                         })
                     })
@@ -55,7 +55,6 @@ router.post('/registor',checkAuth,(req,res) => {
 
 
 })
-
 
 
 
