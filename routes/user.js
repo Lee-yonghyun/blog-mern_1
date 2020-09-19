@@ -5,6 +5,13 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const gravatar = require('gravatar')
 
+function tokenGenerator (payload) {
+    return jwt.sign(
+        payload,
+        process.env.SECRETKEY,
+        {expiresIn: '1d'}
+    )
+}
 
 
 //@ 회원가입
@@ -90,15 +97,9 @@ router.post('/login',(req, res) => {
 
                         const payload = {id: user._id, name:user.name, email:user.email, avatar: user.avatar}
 
-                        const token = jwt.sign(
-                            payload,
-                            process.env.SECRETKEY,
-                            {expiresIn: "1d"}
-                        )
-
                         res.json({
                             success: result,
-                            token: token
+                            token: tokenGenerator(payload)
                         })
                     }
                 })
