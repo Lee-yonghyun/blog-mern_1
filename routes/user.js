@@ -75,34 +75,28 @@ router.post('/login',(req, res) => {
         .findOne({email})
         .then(user => {
 
-            if(!user) {
+            if (!user) {
                 return res.json({
-                    message:'your eamil wrong'
+                    message: 'your email wrong'
                 })
-            }
-
-            else{
+            } else {
                 //user가 등록되어 있다면?
-                bcrypt.compare(password, user.password, (err,result) => {
-
-                    if(err || result === false){
+                user.comparePassword(password, (err, result) => {
+                    if (err || result === false) {
                         return res.json({
-                            success:result,
-                            message:'password incorrect'
+                            message: "password incorrect"
                         })
-                    }
-
-                    else{
+                    } else {
 
                         const token = jwt.sign(
-                            {email:user.email, userId:user._id},
+                            {email: user.email, userId: user._id},
                             "key",
                             {expiresIn: "1d"}
                         )
 
                         res.json({
-                            success:result,
-                            token:token
+                            success: result,
+                            token: token
                         })
                     }
                 })

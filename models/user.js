@@ -60,4 +60,15 @@ userSchema.pre("save", async function(next) {
 })
 
 
+userSchema.methods.comparePassword = function (candidatePassword, callback) {
+    bcrypt.compare(candidatePassword, this.password,  function (err, result) {
+        if(err || result === false) {
+            return callback(err) // result 자리인데 false
+        }
+        callback(null, result) // else , return 값이 생략된 문장., return 값은 true
+    })
+}
+
+// comparePassword의 return 값은 err / false / true
+
 module.exports = mongoose.model('user',userSchema)
