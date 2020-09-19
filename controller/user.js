@@ -105,3 +105,46 @@ exports.login_user = (req, res) => {
             })
         })
 };
+
+
+exports.current_user = (req,res) => {
+
+    res.json({
+        id: req.user.id,
+        email:req.user.email,
+        name:req.user.name,
+        avatar:req.user.avatar,
+        // password:req.user.password
+    })
+}
+
+
+exports.all_user = (req,res) => {
+
+    userModel
+        .findById(req.user.id) //passport의 return된 user값
+        .then(user => {
+
+            if(user.role !== "admin") {
+                return res.json({
+                    message:"you are not admin"
+                })
+            }
+
+            else{
+                userModel
+                    .find()
+                    .then(users => res.json(users))
+                    .catch(err => {
+                        res.json({
+                            message:err.message
+                        })
+                    })
+            }
+        })
+        .catch(err => {
+            res.json({
+                message:err.message
+            })
+        })
+}
