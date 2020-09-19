@@ -88,9 +88,11 @@ router.post('/login',(req, res) => {
                         })
                     } else {
 
+                        const payload = {id: user._id, name:user.name, email:user.email, avatar: user.avatar}
+
                         const token = jwt.sign(
-                            {email: user.email, userId: user._id},
-                            "key",
+                            payload,
+                            process.env.SECRETKEY,
                             {expiresIn: "1d"}
                         )
 
