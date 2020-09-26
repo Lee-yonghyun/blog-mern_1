@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken')
 const userModel = require('../models/user')
 const sgMail = require('@sendgrid/mail')
-sgMail.setApiKey(process.env.API_KEY)
+sgMail.setApiKey(process.env.MAIL_KEY)
 
 
 function tokenGenerator (payload) {
@@ -40,7 +40,7 @@ exports.register_user = (req,res) => {
                     subject: "이메일 인증 요청 메일",
                     html: `
                         <h1>인증요청메일을 전송해 드립니다.</h1>
-                        <p>${process.env.CLIENT_URL}/user/activate/${token}</p>
+                        <p>${process.env.CLIENT_URL}/user/activation/${token}</p>
                         <hr/>
                         <hr/>
                         <p>이 이메일은 개인정보를 포함하고 있습니다.</p>
