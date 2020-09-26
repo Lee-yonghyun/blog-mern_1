@@ -179,6 +179,43 @@ router.post("/experience",checkAuth, (req,res) => {
         })
 })
 
+
+//Delete Experience
+//@route    POST http://localhost:6001/profile/experience/:exp_id
+//@desc     delete experience from profile
+//@access   Private
+router.delete("/experience/:exp_id",checkAuth,(req,res) => {
+
+    profileModel
+        .findOne({user:req.user.id})
+        .then(profile => {
+
+            const removeIndex = profile.experience
+                .map(item => item.id) // [id, id] 형태가 출력된다. [id1 , id2].indexOf(id1) => id1의 index가 출력된다.
+                .indexOf(req.params.exp_id)
+
+            profile.experience.splice(removeIndex,1) // experience의 요소 삭제
+
+            profile
+                .save()
+                .then(profile => {
+                    res.status(200).json(profile)
+                })
+                .catch(err => {
+                    res.status(404).json({
+                        message:err.messgae
+                    })
+                })
+        })
+        .catch(err => {
+            res.status(404).json({
+                message:err.message
+            })
+        })
+})
+
+
+
 //@add education
 router.post("/education",checkAuth, (req,res) => {
 
@@ -211,6 +248,41 @@ router.post("/education",checkAuth, (req,res) => {
                     })
                 })
 
+        })
+        .catch(err => {
+            res.status(404).json({
+                message:err.message
+            })
+        })
+})
+
+
+//Delete Education
+//@route    POST http://localhost:6001/profile/education/:exp_id
+//@desc     delete education from profile
+//@access   Private
+router.delete("/education/:exp_id",checkAuth,(req,res) => {
+
+    profileModel
+        .findOne({user:req.user.id})
+        .then(profile => {
+
+            const removeIndex = profile.education
+                .map(item => item.id) // [id, id] 형태가 출력된다. [id1 , id2].indexOf(id1) => id1의 index가 출력된다.
+                .indexOf(req.params.exp_id)
+
+            profile.education.splice(removeIndex,1) // experience의 요소 삭제
+
+            profile
+                .save()
+                .then(profile => {
+                    res.status(200).json(profile)
+                })
+                .catch(err => {
+                    res.status(404).json({
+                        message:err.messgae
+                    })
+                })
         })
         .catch(err => {
             res.status(404).json({
