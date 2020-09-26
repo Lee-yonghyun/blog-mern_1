@@ -21,6 +21,7 @@ const checkAuth = passport.authenticate("jwt",{session:false})
 router.post('/registor', register_user)
 
 
+
 //@ 인증이메일을 통해 로그인하기
 router.post('/activation',(req,res) => {
 

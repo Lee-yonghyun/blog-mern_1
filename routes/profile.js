@@ -138,4 +138,86 @@ router.delete('/',checkAuth ,(req,res) => {
 
 })
 
+
+//@add experience
+router.post("/experience",checkAuth, (req,res) => {
+
+    profileModel
+        .findOne({user:req.user.id})
+        .then(profile => {
+
+            console.log("profile =", profile)
+
+            const newExperience = {
+                title : req.body.title,
+                company : req.body.company,
+                location : req.body.location,
+                from : req.body.from,
+                to : req.body.to,
+                current : req.body.current,
+                description : req.body.description
+            };
+
+            profile.experience.unshift(newExperience) //unshift experience 인덱스의 첫번째로 추가!
+
+            profile //지금까지는 new model을 만들어서 데이터베이스에 세이브 , 여기는 찾은거를 세이브
+                .save()
+                .then(profile => {
+                    res.status(200).json(profile)
+                })
+                .catch(err => {
+                    res.status(404).json({
+                        message:err.message
+                    })
+                })
+
+        })
+        .catch(err => {
+            res.status(404).json({
+                message:err.message
+            })
+        })
+})
+
+//@add education
+router.post("/education",checkAuth, (req,res) => {
+
+    profileModel
+        .findOne({user:req.user.id})
+        .then(profile => {
+
+            console.log("profile =", profile)
+
+            const newEducation = {
+                school : req.body.school,
+                degree : req.body.degree,
+                fieldOfStudy : req.body.fieldOfStudy,
+                from : req.body.from,
+                to : req.body.to,
+                current : req.body.current,
+                description : req.body.description
+            };
+
+            profile.education.unshift(newEducation) //unshift education 인덱스의 첫번째로 추가!
+
+            profile //수정된 profile을 model에 저장하기!
+                .save()
+                .then(profile => {
+                    res.status(200).json(profile)
+                })
+                .catch(err => {
+                    res.status(404).json({
+                        message:err.message
+                    })
+                })
+
+        })
+        .catch(err => {
+            res.status(404).json({
+                message:err.message
+            })
+        })
+})
+
+
 module.exports = router
