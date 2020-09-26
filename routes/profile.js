@@ -124,6 +124,7 @@ router.delete('/',checkAuth ,(req,res) => {
 
     profileModel
         .findOneAndDelete({user:req.user.id})
+        .deleteOne({user:req.user.id})
         .then(() => {
             res.status(200).json({
                 message:"delete profile"

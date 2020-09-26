@@ -1,5 +1,8 @@
 const jwt = require('jsonwebtoken')
 const userModel = require('../models/user')
+const sgMail = require('@sendgrid/mail')
+sgMail.setApiKey(process.env.API_KEY)
+
 
 function tokenGenerator (payload) {
     return jwt.sign(
@@ -22,43 +25,43 @@ exports.register_user = (req,res) => {
                 });
             }
 
-            else{
+            else {
 
-                const newUser = new userModel({
-                    name,
-                    email,
-                    password
-                })
+                const payload = {name, email, password};
+                const token = jwt.sign(
+                    payload,
+                    process.env.JWT_ACCOUNT_ACTIVATION,
+                    {expiresIn: "10m"}
+                );
 
-                newUser
-                    .save()
-                    .then(user => {
+                const emailDate = {
+                    from: process.env.EMAIL_FROM,
+                    to: email,
+                    subject: "이메일 인증 요청 메일",
+                    html: `
+                        <h1>인증요청메일을 전송해 드립니다.</h1>
+                        <p>${process.env.CLIENT_URL}/user/activate/${token}</p>
+                        <hr/>
+                        <hr/>
+                        <p>이 이메일은 개인정보를 포함하고 있습니다.</p>
+                        <p>${process.env.CLIENT_URL}</p> 
+                    `
+                };
 
-                        console.log(user);
-
-                        res.json({
-                            message:'saved data',
-                            userInfo:{
-                                id:user._id,
-                                name:user.name,
-                                email:user.email,
-                                password:user.password,
-                                avatar:user.avatar,
-                                date:{
-                                    createDate:user.createdAt,
-                                    updateData:user.updatedAt
-                                }
-                            }
+                sgMail
+                    .send(emailDate)
+                    .then(() => {
+                        return res.status(200).json({
+                            message: `이메일이 ${email}로 전송되었습니다.`
                         })
                     })
                     .catch(err => {
-                        res.json({
-                            message:err.message
+                        res.status(400).json({
+                            message: err.message
                         })
                     })
             }
-        })
-
+                    })
         .catch(err => {
             res.json({
                 message:err.message
